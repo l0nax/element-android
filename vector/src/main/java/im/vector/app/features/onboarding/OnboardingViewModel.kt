@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * Please see LICENSE in the repository root for full details.
  */
 
 package im.vector.app.features.onboarding
@@ -21,7 +12,6 @@ import com.airbnb.mvrx.MavericksViewModelFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import im.vector.app.R
 import im.vector.app.core.di.ActiveSessionHolder
 import im.vector.app.core.di.MavericksAssistedViewModelFactory
 import im.vector.app.core.di.hiltMavericksViewModelFactory
@@ -122,30 +112,7 @@ class OnboardingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun checkQrCodeLoginCapability() {
-        if (!vectorFeatures.isQrCodeLoginEnabled()) {
-            setState {
-                copy(
-                        canLoginWithQrCode = false
-                )
-            }
-        } else if (vectorFeatures.isQrCodeLoginForAllServers()) {
-            // allow for all servers
-            setState {
-                copy(
-                        canLoginWithQrCode = true
-                )
-            }
-        } else {
-            setState {
-                copy(
-                        canLoginWithQrCode = selectedHomeserver.isLoginWithQrSupported
-                )
-            }
-        }
-    }
-
-    private val matrixOrgUrl = stringProvider.getString(R.string.matrix_org_server_url).ensureTrailingSlash()
+    private val matrixOrgUrl = stringProvider.getString(im.vector.app.config.R.string.matrix_org_server_url).ensureTrailingSlash()
     private val defaultHomeserverUrl = mdmService.getData(MdmData.DefaultHomeserverUrl, matrixOrgUrl)
 
     private val registrationWizard: RegistrationWizard
@@ -711,7 +678,6 @@ class OnboardingViewModel @AssistedInject constructor(
             _viewEvents.post(OnboardingViewEvents.Failure(Throwable("Unable to create a HomeServerConnectionConfig")))
         } else {
             startAuthenticationFlow(action, homeServerConnectionConfig, serverTypeOverride, suspend {
-                checkQrCodeLoginCapability()
                 postAction()
             })
         }

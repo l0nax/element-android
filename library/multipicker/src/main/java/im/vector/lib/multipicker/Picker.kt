@@ -1,21 +1,13 @@
 /*
- * Copyright (c) 2020 New Vector Ltd
+ * Copyright 2020-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * Please see LICENSE in the repository root for full details.
  */
 
 package im.vector.lib.multipicker
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -58,7 +50,17 @@ abstract class Picker<T> {
         uriList.forEach {
             for (resolveInfo in resInfoList) {
                 val packageName: String = resolveInfo.activityInfo.packageName
-                context.grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                // Replace implicit intent by an explicit to fix crash on some devices like Xiaomi.
+                // see https://juejin.cn/post/7031736325422186510
+                try {
+                    context.grantUriPermission(packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (e: Exception) {
+                    continue
+                }
+                data.action = null
+                data.component = ComponentName(packageName, resolveInfo.activityInfo.name)
+                break
             }
         }
         return getSelectedFiles(context, data)
@@ -82,7 +84,7 @@ abstract class Picker<T> {
         activityResultLauncher.launch(createIntent().apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) })
     }
 
-    protected fun getSelectedUriList(data: Intent?): List<Uri> {
+    protected fun getSelectedUriList(context: Context, data: Intent?): List<Uri> {
         val selectedUriList = mutableListOf<Uri>()
         val dataUri = data?.data
         val clipData = data?.clipData
@@ -104,6 +106,6 @@ abstract class Picker<T> {
                 }
             }
         }
-        return selectedUriList
+        return selectedUriList.onEach { context.grantUriPermission(context.applicationContext.packageName, it, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
     }
 }
