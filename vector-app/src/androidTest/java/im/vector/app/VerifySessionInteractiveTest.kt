@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app
@@ -31,6 +22,7 @@ import androidx.test.filters.LargeTest
 import im.vector.app.core.utils.getMatrixInstance
 import im.vector.app.features.MainActivity
 import im.vector.app.ui.robot.ElementRobot
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.test.runTest
 import org.amshove.kluent.internal.assertEquals
 import org.junit.After
@@ -117,13 +109,13 @@ class VerifySessionInteractiveTest : VerificationTestBase() {
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
                 .perform(
                         actionOnItem<RecyclerView.ViewHolder>(
-                                hasDescendant(withText(R.string.verification_verify_with_another_device)),
+                                hasDescendant(withText(CommonStrings.verification_verify_with_another_device)),
                                 click()
                         )
                 )
 
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .check(matches(hasDescendant(withText(R.string.verification_request_was_sent))))
+                .check(matches(hasDescendant(withText(CommonStrings.verification_request_was_sent))))
 
         val txId = runBlockingTest {
             otherRequest.await().transactionId
@@ -139,9 +131,9 @@ class VerifySessionInteractiveTest : VerificationTestBase() {
         }
 
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .perform(waitForView(hasDescendant(withText(R.string.verification_scan_self_notice))))
+                .perform(waitForView(hasDescendant(withText(CommonStrings.verification_scan_self_notice))))
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .perform(waitForView(hasDescendant(withText(R.string.verification_scan_self_emoji_subtitle))))
+                .perform(waitForView(hasDescendant(withText(CommonStrings.verification_scan_self_emoji_subtitle))))
 
         // there should be the QR code also
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
@@ -151,16 +143,16 @@ class VerifySessionInteractiveTest : VerificationTestBase() {
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
                 .perform(
                         actionOnItem<RecyclerView.ViewHolder>(
-                                hasDescendant(withText(R.string.verification_scan_self_emoji_subtitle)),
+                                hasDescendant(withText(CommonStrings.verification_scan_self_emoji_subtitle)),
                                 click()
                         )
                 )
 
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .perform(waitForView(hasDescendant(withText(R.string.verification_sas_do_not_match))))
+                .perform(waitForView(hasDescendant(withText(CommonStrings.verification_sas_do_not_match))))
 
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .perform(waitForView(hasDescendant(withText(R.string.verification_sas_match))))
+                .perform(waitForView(hasDescendant(withText(CommonStrings.verification_sas_match))))
 
         // check that the code matches
         val uiCode = runBlockingTest {
@@ -190,19 +182,19 @@ class VerifySessionInteractiveTest : VerificationTestBase() {
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
                 .perform(
                         actionOnItem<RecyclerView.ViewHolder>(
-                                hasDescendant(withText(R.string.verification_sas_match)),
+                                hasDescendant(withText(CommonStrings.verification_sas_match)),
                                 click()
                         )
                 )
 
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
-                .perform(waitForView(hasDescendant(withText(R.string.verification_conclusion_ok_notice))))
+                .perform(waitForView(hasDescendant(withText(CommonStrings.verification_conclusion_ok_notice))))
 
         // click on done
         onView(withId(R.id.bottomSheetVerificationRecyclerView))
                 .perform(
                         actionOnItem<RecyclerView.ViewHolder>(
-                                hasDescendant(withText(R.string.done)),
+                                hasDescendant(withText(CommonStrings.done)),
                                 click()
                         )
                 )

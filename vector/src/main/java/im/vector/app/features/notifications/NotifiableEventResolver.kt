@@ -1,22 +1,12 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 package im.vector.app.features.notifications
 
 import android.net.Uri
-import im.vector.app.R
 import im.vector.app.core.extensions.getVectorLastMessageContent
 import im.vector.app.core.extensions.takeAs
 import im.vector.app.core.resources.BuildMeta
@@ -25,6 +15,7 @@ import im.vector.app.features.displayname.getBestName
 import im.vector.app.features.home.room.detail.timeline.format.DisplayableEventFormatter
 import im.vector.app.features.home.room.detail.timeline.format.NoticeEventFormatter
 import im.vector.lib.core.utils.timer.Clock
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.extensions.orFalse
 import org.matrix.android.sdk.api.session.Session
 import org.matrix.android.sdk.api.session.content.ContentUrlResolver
@@ -43,7 +34,9 @@ import org.matrix.android.sdk.api.session.getUserOrDefault
 import org.matrix.android.sdk.api.session.room.getTimelineEvent
 import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.model.RoomMemberContent
+import org.matrix.android.sdk.api.session.room.model.message.ElementCallNotifyContent
 import org.matrix.android.sdk.api.session.room.model.message.MessageWithAttachmentContent
+import org.matrix.android.sdk.api.session.room.model.message.isUserMentioned
 import org.matrix.android.sdk.api.session.room.sender.SenderInfo
 import org.matrix.android.sdk.api.session.room.timeline.TimelineEvent
 import org.matrix.android.sdk.api.session.room.timeline.getEditedEventId
@@ -90,7 +83,7 @@ class NotifiableEventResolver @Inject constructor(
                         noisy = false, // will be updated
                         timestamp = event.originServerTs ?: clock.epochMillis(),
                         description = bodyPreview,
-                        title = stringProvider.getString(R.string.notification_unknown_new_event),
+                        title = stringProvider.getString(CommonStrings.notification_unknown_new_event),
                         soundName = null,
                         type = event.type,
                         canBeReplaced = false
@@ -138,7 +131,7 @@ class NotifiableEventResolver @Inject constructor(
             Timber.e("## Unable to resolve room for eventId [$event]")
             // Ok room is not known in store, but we can still display something
             val body = displayableEventFormatter.format(event, isDm = false, appendAuthor = false)
-            val roomName = stringProvider.getString(R.string.notification_unknown_room_name)
+            val roomName = stringProvider.getString(CommonStrings.notification_unknown_room_name)
             val senderDisplayName = event.senderInfo.disambiguatedDisplayName
 
             NotifiableMessageEvent(
@@ -158,9 +151,11 @@ class NotifiableEventResolver @Inject constructor(
             )
         } else {
             event.attemptToDecryptIfNeeded(session)
-            // only convert encrypted messages to NotifiableMessageEvents
+            // For incoming Element Call, check that the user is mentioned
+            val isIncomingElementCall = event.root.getClearType() in EventType.ELEMENT_CALL_NOTIFY.values &&
+                    event.root.getClearContent()?.toModel<ElementCallNotifyContent>()?.isUserMentioned(session.myUserId) == true
             when {
-                event.root.supportsNotification() -> {
+                isIncomingElementCall || event.root.supportsNotification() -> {
                     val body = displayableEventFormatter.format(event, isDm = room.roomSummary()?.isDirect.orFalse(), appendAuthor = false).toString()
                     val roomName = room.roomSummary()?.displayName ?: ""
                     val senderDisplayName = event.senderInfo.disambiguatedDisplayName
@@ -247,7 +242,7 @@ class NotifiableEventResolver @Inject constructor(
         if (Membership.INVITE == content.membership) {
             val roomSummary = session.getRoomSummary(roomId)
             val body = noticeEventFormatter.format(event, dName, isDm = roomSummary?.isDirect.orFalse())
-                    ?: stringProvider.getString(R.string.notification_new_invitation)
+                    ?: stringProvider.getString(CommonStrings.notification_new_invitation)
             return InviteNotifiableEvent(
                     session.myUserId,
                     eventId = event.eventId!!,
@@ -257,7 +252,7 @@ class NotifiableEventResolver @Inject constructor(
                     roomName = roomSummary?.displayName,
                     timestamp = event.originServerTs ?: 0,
                     noisy = isNoisy,
-                    title = stringProvider.getString(R.string.notification_new_invitation),
+                    title = stringProvider.getString(CommonStrings.notification_new_invitation),
                     description = body.toString(),
                     soundName = null, // will be set later
                     type = event.getClearType()

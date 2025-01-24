@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.permalink
@@ -19,7 +10,6 @@ package im.vector.app.features.permalink
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.FragmentActivity
-import im.vector.app.R
 import im.vector.app.core.di.ActiveSessionHolder
 import im.vector.app.core.extensions.isIgnored
 import im.vector.app.core.resources.UserPreferencesProvider
@@ -28,6 +18,7 @@ import im.vector.app.features.home.room.threads.arguments.ThreadTimelineArgs
 import im.vector.app.features.matrixto.OriginOfMatrixTo
 import im.vector.app.features.navigation.Navigator
 import im.vector.app.features.roomdirectory.roompreview.RoomPreviewData
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.matrix.android.sdk.api.extensions.orFalse
@@ -66,7 +57,7 @@ class PermalinkHandler @Inject constructor(
             navigationInterceptor: NavigationInterceptor? = null,
             buildTask: Boolean = false
     ): Boolean {
-        val supportedHosts = fragmentActivity.resources.getStringArray(R.array.permalink_supported_hosts)
+        val supportedHosts = fragmentActivity.resources.getStringArray(im.vector.app.config.R.array.permalink_supported_hosts)
         return when {
             deepLink == null -> false
             deepLink.isIgnored() -> true
@@ -198,7 +189,7 @@ class PermalinkHandler @Inject constructor(
     ) {
         val session = activeSessionHolder.getSafeActiveSession() ?: return
         if (roomId == null) {
-            fragmentActivity.toast(R.string.room_error_not_found)
+            fragmentActivity.toast(CommonStrings.room_error_not_found)
             return
         }
         val roomSummary = session.getRoomSummary(roomId)
@@ -207,7 +198,7 @@ class PermalinkHandler @Inject constructor(
 //        val roomAlias = permalinkData.getRoomAliasOrNull()
         val isSpace = roomSummary?.roomType == RoomType.SPACE
         return when {
-            membership == Membership.BAN -> fragmentActivity.toast(R.string.error_opening_banned_room)
+            membership == Membership.BAN -> fragmentActivity.toast(CommonStrings.error_opening_banned_room)
             membership?.isActive().orFalse() -> {
                 if (!isSpace && membership == Membership.JOIN) {
                     // If it's a room you're in, let's just open it, you can tap back if needed

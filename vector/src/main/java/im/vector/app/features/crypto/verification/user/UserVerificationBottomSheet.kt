@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.crypto.verification.user
@@ -40,6 +31,7 @@ import im.vector.app.features.crypto.verification.VerificationBottomSheetViewEve
 import im.vector.app.features.displayname.getBestName
 import im.vector.app.features.home.AvatarRenderer
 import im.vector.app.features.themes.ThemeUtils
+import im.vector.lib.strings.CommonStrings
 import kotlinx.parcelize.Parcelize
 import org.matrix.android.sdk.api.session.crypto.model.RoomEncryptionTrustLevel
 import javax.inject.Inject
@@ -95,10 +87,10 @@ class UserVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
                 }
                 is VerificationBottomSheetViewEvents.ModalError -> {
                     MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(getString(R.string.dialog_title_error))
+                            .setTitle(getString(CommonStrings.dialog_title_error))
                             .setMessage(event.errorMessage)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.ok, null)
+                            .setPositiveButton(CommonStrings.ok, null)
                             .show()
                 }
                 VerificationBottomSheetViewEvents.ResetAll,
@@ -110,15 +102,18 @@ class UserVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
                 }
                 is VerificationBottomSheetViewEvents.ConfirmCancel -> {
                     MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(getString(R.string.dialog_title_confirmation))
+                            .setTitle(getString(CommonStrings.dialog_title_confirmation))
                             .setMessage(
-                                    getString(R.string.verify_cancel_other, event.otherUserId, event.deviceId ?: "*")
+                                    getString(CommonStrings.verify_cancel_other, event.otherUserId, event.deviceId ?: "*")
                                             .toSpannable()
-                                            .colorizeMatchingText(event.otherUserId, ThemeUtils.getColor(requireContext(), R.attr.vctr_notice_text_color))
+                                            .colorizeMatchingText(
+                                                    event.otherUserId,
+                                                    ThemeUtils.getColor(requireContext(), im.vector.lib.ui.styles.R.attr.vctr_notice_text_color)
+                                            )
                             )
                             .setCancelable(false)
-                            .setPositiveButton(R.string._resume, null)
-                            .setNegativeButton(R.string.action_cancel) { _, _ ->
+                            .setPositiveButton(CommonStrings._resume, null)
+                            .setNegativeButton(CommonStrings.action_cancel) { _, _ ->
                                 viewModel.handle(VerificationAction.CancelPendingVerification)
                             }
                             .show()
@@ -142,7 +137,7 @@ class UserVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
 
     override fun invalidate() = withState(viewModel) { state ->
         avatarRenderer.render(state.otherUserMxItem, views.otherUserAvatarImageView)
-        views.otherUserNameText.text = getString(R.string.verification_verify_user, state.otherUserMxItem.getBestName())
+        views.otherUserNameText.text = getString(CommonStrings.verification_verify_user, state.otherUserMxItem.getBestName())
         views.otherUserShield.render(
                 if (state.otherUserIsTrusted) RoomEncryptionTrustLevel.Trusted
                 else RoomEncryptionTrustLevel.Default

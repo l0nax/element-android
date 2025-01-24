@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.crypto.verification.self
@@ -41,6 +32,7 @@ import im.vector.app.features.crypto.quads.SharedSecureStorageViewState
 import im.vector.app.features.crypto.verification.VerificationAction
 import im.vector.app.features.crypto.verification.VerificationBottomSheetViewEvents
 import im.vector.app.features.settings.VectorSettingsActivity
+import im.vector.lib.strings.CommonStrings
 import kotlinx.parcelize.Parcelize
 import org.matrix.android.sdk.api.session.crypto.crosssigning.KEYBACKUP_SECRET_SSSS_NAME
 import org.matrix.android.sdk.api.session.crypto.crosssigning.MASTER_KEY_SSSS_NAME
@@ -142,10 +134,10 @@ class SelfVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
                 }
                 is VerificationBottomSheetViewEvents.ModalError -> {
                     MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(getString(R.string.dialog_title_error))
+                            .setTitle(getString(CommonStrings.dialog_title_error))
                             .setMessage(event.errorMessage)
                             .setCancelable(false)
-                            .setPositiveButton(R.string.ok, null)
+                            .setPositiveButton(CommonStrings.ok, null)
                             .show()
                 }
                 VerificationBottomSheetViewEvents.DismissAndOpenDeviceSettings -> {
@@ -180,10 +172,10 @@ class SelfVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
 //                }
 //                is VerificationBottomSheetViewEvents.ModalError -> {
 //                    MaterialAlertDialogBuilder(requireContext())
-//                            .setTitle(getString(R.string.dialog_title_error))
+//                            .setTitle(getString(CommonStrings.dialog_title_error))
 //                            .setMessage(it.errorMessage)
 //                            .setCancelable(false)
-//                            .setPositiveButton(R.string.ok, null)
+//                            .setPositiveButton(CommonStrings.ok, null)
 //                            .show()
 //                    Unit
 //                }
@@ -204,12 +196,12 @@ class SelfVerificationBottomSheet : VectorBaseBottomSheetDialogFragment<BottomSh
             views.otherUserAvatarImageView.setImageResource(
                     R.drawable.ic_shield_trusted
             )
-            views.otherUserNameText.text = getString(R.string.verification_profile_verify)
+            views.otherUserNameText.text = getString(CommonStrings.verification_profile_verify)
         } else {
             views.otherUserAvatarImageView.setImageResource(
                     R.drawable.ic_shield_black
             )
-            views.otherUserNameText.text = getString(R.string.crosssigning_verify_this_session)
+            views.otherUserNameText.text = getString(CommonStrings.crosssigning_verify_this_session)
         }
 
         super.invalidate()

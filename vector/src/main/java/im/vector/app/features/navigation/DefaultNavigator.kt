@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.navigation
@@ -32,7 +23,6 @@ import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import im.vector.app.R
 import im.vector.app.SpaceStateHandler
 import im.vector.app.config.OnboardingVariant
 import im.vector.app.core.debug.DebugNavigator
@@ -72,8 +62,6 @@ import im.vector.app.features.location.live.map.LiveLocationMapViewActivity
 import im.vector.app.features.location.live.map.LiveLocationMapViewArgs
 import im.vector.app.features.login.LoginActivity
 import im.vector.app.features.login.LoginConfig
-import im.vector.app.features.login.qr.QrCodeLoginActivity
-import im.vector.app.features.login.qr.QrCodeLoginArgs
 import im.vector.app.features.matrixto.MatrixToBottomSheet
 import im.vector.app.features.matrixto.OriginOfMatrixTo
 import im.vector.app.features.media.AttachmentData
@@ -107,6 +95,7 @@ import im.vector.app.features.spaces.people.SpacePeopleActivity
 import im.vector.app.features.terms.ReviewTermsActivity
 import im.vector.app.features.widgets.WidgetActivity
 import im.vector.app.features.widgets.WidgetArgsBuilder
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -398,7 +387,7 @@ class DefaultNavigator @Inject constructor(
     }
 
     override fun showGroupsUnsupportedWarning(context: Context) {
-        Toast.makeText(context, context.getString(R.string.permalink_unsupported_groups), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(CommonStrings.permalink_unsupported_groups), Toast.LENGTH_LONG).show()
     }
 
     override fun openRoomProfile(context: Context, roomId: String, directAccess: Int?) {
@@ -460,9 +449,9 @@ class DefaultNavigator @Inject constructor(
             // Jitsi SDK is now for API 24+
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.dialog_title_error)
-                        .setMessage(R.string.error_jitsi_not_supported_on_old_device)
-                        .setPositiveButton(R.string.ok, null)
+                        .setTitle(CommonStrings.dialog_title_error)
+                        .setMessage(CommonStrings.error_jitsi_not_supported_on_old_device)
+                        .setPositiveButton(CommonStrings.ok, null)
                         .show()
             } else {
                 val enableVideo = options?.get(JitsiCallViewModel.ENABLE_VIDEO_OPTION) == true
@@ -612,14 +601,6 @@ class DefaultNavigator @Inject constructor(
             activityResultLauncher: ActivityResultLauncher<Intent>
     ) {
         activityResultLauncher.launch(screenCaptureIntent)
-    }
-
-    override fun openLoginWithQrCode(context: Context, qrCodeLoginArgs: QrCodeLoginArgs) {
-        QrCodeLoginActivity
-                .getIntent(context, qrCodeLoginArgs)
-                .also {
-                    context.startActivity(it)
-                }
     }
 
     private fun Intent.start(context: Context) {

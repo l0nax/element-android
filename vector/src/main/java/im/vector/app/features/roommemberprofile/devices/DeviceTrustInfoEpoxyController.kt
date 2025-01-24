@@ -1,18 +1,8 @@
 /*
- * Copyright 2020 New Vector Ltd
+ * Copyright 2020-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 package im.vector.app.features.roommemberprofile.devices
 
@@ -27,6 +17,7 @@ import im.vector.app.core.ui.list.genericWithValueItem
 import im.vector.app.core.utils.DimensionConverter
 import im.vector.app.features.settings.devices.TrustUtils
 import im.vector.lib.core.utils.epoxy.charsequence.toEpoxyCharSequence
+import im.vector.lib.strings.CommonStrings
 import me.gujun.android.span.span
 import org.matrix.android.sdk.api.extensions.orFalse
 import org.matrix.android.sdk.api.session.crypto.model.RoomEncryptionTrustLevel
@@ -68,20 +59,20 @@ class DeviceTrustInfoEpoxyController @Inject constructor(
                 titleIconResourceId(shield)
                 title(
                         host.stringProvider
-                                .getString(if (isVerified) R.string.verification_profile_verified else R.string.verification_profile_warning)
+                                .getString(if (isVerified) CommonStrings.verification_profile_verified else CommonStrings.verification_profile_warning)
                                 .toEpoxyCharSequence()
                 )
             }
             genericFooterItem {
                 id("desc")
                 centered(false)
-                textColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+                textColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
                 apply {
                     if (isVerified) {
                         // TODO FORMAT
                         text(
                                 host.stringProvider.getString(
-                                        R.string.verification_profile_device_verified_because,
+                                        CommonStrings.verification_profile_device_verified_because,
                                         data.userItem?.displayName ?: "",
                                         data.userItem?.id ?: ""
                                 ).toEpoxyCharSequence()
@@ -90,14 +81,14 @@ class DeviceTrustInfoEpoxyController @Inject constructor(
                         // TODO what if mine
                         text(
                                 host.stringProvider.getString(
-                                        R.string.verification_profile_device_new_signing,
+                                        CommonStrings.verification_profile_device_new_signing,
                                         data.userItem?.displayName ?: "",
                                         data.userItem?.id ?: ""
                                 ).toEpoxyCharSequence()
                         )
                     }
                 }
-//                    text(stringProvider.getString(R.string.verification_profile_device_untrust_info))
+//                    text(stringProvider.getString(CommonStrings.verification_profile_device_untrust_info))
             }
 
             genericWithValueItem {
@@ -108,7 +99,7 @@ class DeviceTrustInfoEpoxyController @Inject constructor(
                             +(cryptoDeviceInfo.displayName() ?: "")
                             span {
                                 text = " (${cryptoDeviceInfo.deviceId})"
-                                textColor = host.colorProvider.getColorFromAttribute(R.attr.vctr_content_secondary)
+                                textColor = host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_secondary)
                                 textSize = host.dimensionConverter.spToPx(14)
                             }
                         }.toEpoxyCharSequence()
@@ -119,8 +110,8 @@ class DeviceTrustInfoEpoxyController @Inject constructor(
                 genericFooterItem {
                     id("warn")
                     centered(false)
-                    textColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
-                    text(host.stringProvider.getString(R.string.verification_profile_other_device_untrust_info).toEpoxyCharSequence())
+                    textColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
+                    text(host.stringProvider.getString(CommonStrings.verification_profile_other_device_untrust_info).toEpoxyCharSequence())
                 }
             }
         }

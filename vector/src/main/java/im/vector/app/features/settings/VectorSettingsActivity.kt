@@ -1,17 +1,8 @@
 /*
- * Copyright 2018 New Vector Ltd
+ * Copyright 2018-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 package im.vector.app.features.settings
 
@@ -35,6 +26,7 @@ import im.vector.app.features.settings.devices.VectorSettingsDevicesFragment
 import im.vector.app.features.settings.notifications.VectorSettingsNotificationFragment
 import im.vector.app.features.settings.threepids.ThreePidsSettingsFragment
 import im.vector.lib.core.utils.compat.getParcelableExtraCompat
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.failure.GlobalError
 import org.matrix.android.sdk.api.session.Session
 import timber.log.Timber
@@ -55,7 +47,7 @@ class VectorSettingsActivity : VectorBaseActivity<ActivityVectorSettingsBinding>
 
     override fun getCoordinatorLayout() = views.coordinatorLayout
 
-    override fun getTitleRes() = R.string.title_activity_settings
+    override fun getTitleRes() = CommonStrings.title_activity_settings
 
     private var keyToHighlight: String? = null
 
@@ -122,7 +114,7 @@ class VectorSettingsActivity : VectorBaseActivity<ActivityVectorSettingsBinding>
                 supportFragmentManager.fragmentFactory.instantiate(classLoader, it)
             }
         } catch (e: Throwable) {
-            showSnackbar(getString(R.string.not_implemented))
+            showSnackbar(getString(CommonStrings.not_implemented))
             Timber.e(e)
             null
         }

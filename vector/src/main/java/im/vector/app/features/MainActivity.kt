@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features
@@ -29,7 +20,6 @@ import com.airbnb.mvrx.viewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import im.vector.app.R
 import im.vector.app.core.extensions.startSyncing
 import im.vector.app.core.extensions.vectorStore
 import im.vector.app.core.platform.VectorBaseActivity
@@ -39,6 +29,9 @@ import im.vector.app.features.analytics.VectorAnalytics
 import im.vector.app.features.analytics.plan.ViewRoom
 import im.vector.app.features.home.HomeActivity
 import im.vector.app.features.home.ShortcutsHandler
+import im.vector.app.features.home.room.detail.RoomDetailActivity
+import im.vector.app.features.home.room.threads.ThreadsActivity
+import im.vector.app.features.location.live.map.LiveLocationMapViewActivity
 import im.vector.app.features.notifications.NotificationDrawerManager
 import im.vector.app.features.pin.UnlockedActivity
 import im.vector.app.features.pin.lockscreen.crypto.LockScreenKeyRepository
@@ -54,6 +47,7 @@ import im.vector.app.features.start.StartAppViewState
 import im.vector.app.features.themes.ActivityOtherThemes
 import im.vector.app.features.ui.UiStateRepository
 import im.vector.lib.core.utils.compat.getParcelableExtraCompat
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -115,6 +109,14 @@ class MainActivity : VectorBaseActivity<ActivityMainBinding>(), UnlockedActivity
                 putExtra(EXTRA_ROOM_ID, roomId)
             }
         }
+
+        val allowList = listOf(
+                HomeActivity::class.java.name,
+                MainActivity::class.java.name,
+                RoomDetailActivity::class.java.name,
+                ThreadsActivity::class.java.name,
+                LiveLocationMapViewActivity::class.java.name,
+        )
     }
 
     private val startAppViewModel: StartAppViewModel by viewModel()
@@ -150,7 +152,7 @@ class MainActivity : VectorBaseActivity<ActivityMainBinding>(), UnlockedActivity
 
     private fun renderState(state: StartAppViewState) {
         if (state.mayBeLongToProcess) {
-            views.status.setText(R.string.updating_your_data)
+            views.status.setText(CommonStrings.updating_your_data)
         }
         views.status.isVisible = state.mayBeLongToProcess
     }
@@ -186,6 +188,7 @@ class MainActivity : VectorBaseActivity<ActivityMainBinding>(), UnlockedActivity
             // Start the next Activity
             startSyncing()
             val nextIntent = intent.getParcelableExtraCompat<Intent>(EXTRA_NEXT_INTENT)
+                    ?.takeIf { it.isValid() }
             startIntentAndFinish(nextIntent)
         } else if (intent.hasExtra(EXTRA_INIT_SESSION)) {
             startSyncing()
@@ -326,15 +329,15 @@ class MainActivity : VectorBaseActivity<ActivityMainBinding>(), UnlockedActivity
     ) {
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.dialog_title_error)
-                    .setMessage(R.string.sign_out_failed_dialog_message)
-                    .setPositiveButton(R.string.sign_out_anyway) { _, _ ->
+                    .setTitle(CommonStrings.dialog_title_error)
+                    .setMessage(CommonStrings.sign_out_failed_dialog_message)
+                    .setPositiveButton(CommonStrings.sign_out_anyway) { _, _ ->
                         signout(session, onboardingStore, ignoreServerError = true)
                     }
-                    .setNeutralButton(R.string.global_retry) { _, _ ->
+                    .setNeutralButton(CommonStrings.global_retry) { _, _ ->
                         signout(session, onboardingStore, ignoreServerError = false)
                     }
-                    .setNegativeButton(R.string.action_cancel) { _, _ -> startNextActivityAndFinish(ignoreClearCredentials = true) }
+                    .setNegativeButton(CommonStrings.action_cancel) { _, _ -> startNextActivityAndFinish(ignoreClearCredentials = true) }
                     .setCancelable(false)
                     .show()
         }
@@ -379,5 +382,12 @@ class MainActivity : VectorBaseActivity<ActivityMainBinding>(), UnlockedActivity
     private fun startIntentAndFinish(intent: Intent?) {
         intent?.let { startActivity(it) }
         finish()
+    }
+
+    private fun Intent.isValid(): Boolean {
+        val componentName = resolveActivity(packageManager) ?: return false
+        val packageName = componentName.packageName
+        val className = componentName.className
+        return packageName == buildMeta.applicationId && className in allowList
     }
 }

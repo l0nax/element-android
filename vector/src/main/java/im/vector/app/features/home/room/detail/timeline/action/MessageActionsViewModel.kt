@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 package im.vector.app.features.home.room.detail.timeline.action
 
@@ -20,7 +11,6 @@ import dagger.Lazy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import im.vector.app.R
 import im.vector.app.core.di.MavericksAssistedViewModelFactory
 import im.vector.app.core.di.hiltMavericksViewModelFactory
 import im.vector.app.core.error.ErrorFormatter
@@ -36,6 +26,7 @@ import im.vector.app.features.html.VectorHtmlCompressor
 import im.vector.app.features.powerlevel.PowerLevelsFlowFactory
 import im.vector.app.features.reactions.data.EmojiDataSource
 import im.vector.app.features.settings.VectorPreferences
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -197,7 +188,7 @@ class MessageActionsViewModel @AssistedInject constructor(
 
                             eventHtmlRenderer.get().render(html, pillsPostProcessor)
                         } else if (messageContent is MessageVerificationRequestContent) {
-                            stringProvider.getString(R.string.verification_request)
+                            stringProvider.getString(CommonStrings.verification_request)
                         } else {
                             messageContent?.body
                         }
@@ -218,10 +209,13 @@ class MessageActionsViewModel @AssistedInject constructor(
                     }
                     in EventType.POLL_START.values -> {
                         (timelineEvent.getVectorLastMessageContent() as? MessagePollContent)?.getBestPollCreationInfo()?.question?.getBestQuestion()
-                                ?: stringProvider.getString(R.string.message_reply_to_poll_preview)
+                                ?: stringProvider.getString(CommonStrings.message_reply_to_poll_preview)
                     }
                     in EventType.POLL_END.values -> {
-                        stringProvider.getString(R.string.message_reply_to_ended_poll_preview)
+                        stringProvider.getString(CommonStrings.message_reply_to_ended_poll_preview)
+                    }
+                    in EventType.ELEMENT_CALL_NOTIFY.values -> {
+                        stringProvider.getString(CommonStrings.call_unsupported)
                     }
                     else -> null
                 }
@@ -242,15 +236,15 @@ class MessageActionsViewModel @AssistedInject constructor(
                 .let { reason ->
                     if (reason == null) {
                         if (timelineEvent.root.isRedactedBySameUser()) {
-                            stringProvider.getString(R.string.event_redacted_by_user_reason)
+                            stringProvider.getString(CommonStrings.event_redacted_by_user_reason)
                         } else {
-                            stringProvider.getString(R.string.event_redacted_by_admin_reason)
+                            stringProvider.getString(CommonStrings.event_redacted_by_admin_reason)
                         }
                     } else {
                         if (timelineEvent.root.isRedactedBySameUser()) {
-                            stringProvider.getString(R.string.event_redacted_by_user_reason_with_reason, reason)
+                            stringProvider.getString(CommonStrings.event_redacted_by_user_reason_with_reason, reason)
                         } else {
-                            stringProvider.getString(R.string.event_redacted_by_admin_reason_with_reason, reason)
+                            stringProvider.getString(CommonStrings.event_redacted_by_admin_reason_with_reason, reason)
                         }
                     }
                 }
@@ -282,7 +276,7 @@ class MessageActionsViewModel @AssistedInject constructor(
         add(EventSharedAction.ViewSource(timelineEvent.root.toContentStringWithIndent()))
         if (timelineEvent.isEncrypted() && timelineEvent.root.mxDecryptionResult != null) {
             val decryptedContent = timelineEvent.root.toClearContentStringWithIndent()
-                    ?: stringProvider.getString(R.string.encryption_information_decryption_error)
+                    ?: stringProvider.getString(CommonStrings.encryption_information_decryption_error)
             add(EventSharedAction.ViewDecryptedSource(decryptedContent))
         }
     }
@@ -313,7 +307,7 @@ class MessageActionsViewModel @AssistedInject constructor(
     private fun ArrayList<EventSharedAction>.addActionsForSendingState(timelineEvent: TimelineEvent) {
         // TODO is uploading attachment?
         if (canCancel(timelineEvent)) {
-            add(EventSharedAction.Cancel(timelineEvent.eventId, false))
+            add(EventSharedAction.Cancel(timelineEvent, false))
         }
     }
 
@@ -321,7 +315,7 @@ class MessageActionsViewModel @AssistedInject constructor(
         // If sent but not synced (synapse stuck at bottom bug)
         // Still offer action to cancel (will only remove local echo)
         timelineEvent.root.eventId?.let {
-            add(EventSharedAction.Cancel(it, true))
+            add(EventSharedAction.Cancel(timelineEvent, true))
         }
 
         // TODO Can be redacted
@@ -388,8 +382,8 @@ class MessageActionsViewModel @AssistedInject constructor(
                             EventSharedAction.Redact(
                                     eventId,
                                     askForReason = informationData.senderId != session.myUserId,
-                                    dialogTitleRes = R.string.delete_poll_dialog_title,
-                                    dialogDescriptionRes = R.string.delete_poll_dialog_content
+                                    dialogTitleRes = CommonStrings.delete_poll_dialog_title,
+                                    dialogDescriptionRes = CommonStrings.delete_poll_dialog_content
                             )
                     )
                 } else {
@@ -397,8 +391,8 @@ class MessageActionsViewModel @AssistedInject constructor(
                             EventSharedAction.Redact(
                                     eventId,
                                     askForReason = informationData.senderId != session.myUserId,
-                                    dialogTitleRes = R.string.delete_event_dialog_title,
-                                    dialogDescriptionRes = R.string.delete_event_dialog_content
+                                    dialogTitleRes = CommonStrings.delete_event_dialog_title,
+                                    dialogDescriptionRes = CommonStrings.delete_event_dialog_content
                             )
                     )
                 }
@@ -430,6 +424,12 @@ class MessageActionsViewModel @AssistedInject constructor(
 
             add(EventSharedAction.Separator)
             add(EventSharedAction.IgnoreUser(timelineEvent.root.senderId))
+            add(
+                    EventSharedAction.ReportUser(
+                            eventId = eventId,
+                            senderId = timelineEvent.root.senderId,
+                    )
+            )
         }
     }
 

@@ -1,17 +1,8 @@
 /*
- * Copyright 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 @file:Suppress("UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER", "UNUSED_PARAMETER")
@@ -58,6 +49,7 @@ import im.vector.app.features.analytics.plan.MobileScreen
 import im.vector.app.features.discovery.DiscoverySettingsFragment
 import im.vector.app.features.navigation.SettingsActivityPayload
 import im.vector.app.features.workers.signout.SignOutUiWorker
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -85,7 +77,7 @@ class VectorSettingsGeneralFragment :
 
     @Inject lateinit var galleryOrCameraDialogHelperFactory: GalleryOrCameraDialogHelperFactory
 
-    override var titleRes = R.string.settings_general_title
+    override var titleRes = CommonStrings.settings_general_title
     override val preferenceXmlRes = R.xml.vector_settings_general
 
     private lateinit var galleryOrCameraDialogHelper: GalleryOrCameraDialogHelper
@@ -232,7 +224,7 @@ class VectorSettingsGeneralFragment :
             val hostname = URL(homeServerCapabilities.externalAccountManagementUrl).host
 
             mExternalAccountManagementPreference.summary = requireContext().getString(
-                    R.string.settings_external_account_management,
+                    CommonStrings.settings_external_account_management,
                     hostname
             )
         } else {
@@ -296,7 +288,7 @@ class VectorSettingsGeneralFragment :
         // clear medias cache
         findPreference<VectorPreference>(VectorPreferences.SETTINGS_CLEAR_MEDIA_CACHE_PREFERENCE_KEY)!!.let {
             lifecycleScope.launch(Dispatchers.Main) {
-                it.summary = getString(R.string.loading)
+                it.summary = getString(CommonStrings.loading)
                 val size = getCacheSize()
                 it.summary = TextUtils.formatFileSize(requireContext(), size)
                 it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -338,7 +330,7 @@ class VectorSettingsGeneralFragment :
     override fun onResume() {
         super.onResume()
         // Refresh identity server summary
-        mIdentityServerPreference.summary = session.identityService().getCurrentIdentityServerUrl() ?: getString(R.string.identity_server_not_defined)
+        mIdentityServerPreference.summary = session.identityService().getCurrentIdentityServerUrl() ?: getString(CommonStrings.identity_server_not_defined)
         refreshIntegrationManagerSettings()
         session.integrationManagerService().addListener(integrationServiceListener)
     }
@@ -431,8 +423,8 @@ class VectorSettingsGeneralFragment :
             val dialog = MaterialAlertDialogBuilder(activity)
                     .setView(view)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.settings_change_password, null)
-                    .setNegativeButton(R.string.action_cancel, null)
+                    .setPositiveButton(CommonStrings.settings_change_password, null)
+                    .setNegativeButton(CommonStrings.action_cancel, null)
                     .setOnDismissListener {
                         view.hideKeyboard()
                     }
@@ -500,12 +492,12 @@ class VectorSettingsGeneralFragment :
                         showPasswordLoadingView(false)
                         result.fold({
                             dialog.dismiss()
-                            activity.toast(R.string.settings_password_updated)
+                            activity.toast(CommonStrings.settings_password_updated)
                         }, { failure ->
                             if (failure.isInvalidPassword()) {
-                                views.changePasswordOldPwdTil.error = getString(R.string.settings_fail_to_update_password_invalid_current_password)
+                                views.changePasswordOldPwdTil.error = getString(CommonStrings.settings_fail_to_update_password_invalid_current_password)
                             } else {
-                                views.changePasswordOldPwdTil.error = getString(R.string.settings_fail_to_update_password)
+                                views.changePasswordOldPwdTil.error = getString(CommonStrings.settings_fail_to_update_password)
                             }
                         })
                     }

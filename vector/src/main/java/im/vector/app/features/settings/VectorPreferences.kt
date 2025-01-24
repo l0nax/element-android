@@ -1,17 +1,8 @@
 /*
- * Copyright 2018 New Vector Ltd
+ * Copyright 2018-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 package im.vector.app.features.settings
 
@@ -23,7 +14,6 @@ import android.provider.MediaStore
 import androidx.annotation.BoolRes
 import androidx.core.content.edit
 import com.squareup.seismic.ShakeDetector
-import im.vector.app.R
 import im.vector.app.core.di.DefaultPreferences
 import im.vector.app.core.resources.BuildMeta
 import im.vector.app.core.resources.StringProvider
@@ -32,6 +22,7 @@ import im.vector.app.features.home.ShortcutsHandler
 import im.vector.app.features.homeserver.ServerUrlsRepository
 import im.vector.app.features.themes.ThemeUtils
 import im.vector.lib.core.utils.timer.Clock
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.extensions.tryOrNull
 import timber.log.Timber
 import javax.inject.Inject
@@ -538,7 +529,7 @@ class VectorPreferences @Inject constructor(
                 if (value.startsWith("file://")) {
                     // it should never happen
                     // else android.os.FileUriExposedException will be triggered.
-                    // see https://github.com/vector-im/riot-android/issues/1725
+                    // see https://github.com/element-hq/riot-android/issues/1725
                     return
                 }
             }
@@ -562,7 +553,7 @@ class VectorPreferences @Inject constructor(
 
         var uri: Uri? = null
 
-        // https://github.com/vector-im/riot-android/issues/1725
+        // https://github.com/element-hq/riot-android/issues/1725
         if (null != url && !url.startsWith("file://")) {
             try {
                 uri = Uri.parse(url)
@@ -719,10 +710,10 @@ class VectorPreferences @Inject constructor(
      */
     fun getSelectedMediasSavingPeriodString(): String {
         return when (getSelectedMediasSavingPeriod()) {
-            MEDIA_SAVING_3_DAYS -> stringProvider.getString(R.string.media_saving_period_3_days)
-            MEDIA_SAVING_1_WEEK -> stringProvider.getString(R.string.media_saving_period_1_week)
-            MEDIA_SAVING_1_MONTH -> stringProvider.getString(R.string.media_saving_period_1_month)
-            MEDIA_SAVING_FOREVER -> stringProvider.getString(R.string.media_saving_period_forever)
+            MEDIA_SAVING_3_DAYS -> stringProvider.getString(CommonStrings.media_saving_period_3_days)
+            MEDIA_SAVING_1_WEEK -> stringProvider.getString(CommonStrings.media_saving_period_1_week)
+            MEDIA_SAVING_1_MONTH -> stringProvider.getString(CommonStrings.media_saving_period_1_month)
+            MEDIA_SAVING_FOREVER -> stringProvider.getString(CommonStrings.media_saving_period_forever)
             else -> "?"
         }
     }
@@ -760,7 +751,7 @@ class VectorPreferences @Inject constructor(
      * @return true if the text formatting is enabled
      */
     fun isTextFormattingEnabled(): Boolean =
-        defaultPrefs.getBoolean(SETTINGS_ENABLE_RICH_TEXT_FORMATTING_KEY, true)
+            defaultPrefs.getBoolean(SETTINGS_ENABLE_RICH_TEXT_FORMATTING_KEY, true)
 
     /**
      * Update whether text formatting is enabled within the rich text editor.
@@ -768,9 +759,9 @@ class VectorPreferences @Inject constructor(
      * @param isEnabled true to enable the text formatting
      */
     fun setTextFormattingEnabled(isEnabled: Boolean) =
-        defaultPrefs.edit {
-            putBoolean(SETTINGS_ENABLE_RICH_TEXT_FORMATTING_KEY, isEnabled)
-        }
+            defaultPrefs.edit {
+                putBoolean(SETTINGS_ENABLE_RICH_TEXT_FORMATTING_KEY, isEnabled)
+            }
 
     /**
      * Tells if a confirmation dialog should be displayed before staring a call.
@@ -930,7 +921,7 @@ class VectorPreferences @Inject constructor(
      * @return true to show timeline message in bubble.
      */
     fun useMessageBubblesLayout(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_INTERFACE_BUBBLE_KEY, getDefault(R.bool.settings_interface_bubble_default))
+        return defaultPrefs.getBoolean(SETTINGS_INTERFACE_BUBBLE_KEY, getDefault(im.vector.app.config.R.bool.settings_interface_bubble_default))
     }
 
     /**
@@ -941,7 +932,7 @@ class VectorPreferences @Inject constructor(
     fun userAlwaysAppearsOffline(): Boolean {
         return defaultPrefs.getBoolean(
                 SETTINGS_PRESENCE_USER_ALWAYS_APPEARS_OFFLINE,
-                getDefault(R.bool.settings_presence_user_always_appears_offline_default)
+                getDefault(im.vector.app.config.R.bool.settings_presence_user_always_appears_offline_default)
         )
     }
 
@@ -1123,7 +1114,7 @@ class VectorPreferences @Inject constructor(
      * Indicates whether or not thread messages are enabled.
      */
     fun areThreadMessagesEnabled(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_LABS_ENABLE_THREAD_MESSAGES, getDefault(R.bool.settings_labs_thread_messages_default))
+        return defaultPrefs.getBoolean(SETTINGS_LABS_ENABLE_THREAD_MESSAGES, getDefault(im.vector.app.config.R.bool.settings_labs_thread_messages_default))
     }
 
     /**
@@ -1214,45 +1205,62 @@ class VectorPreferences @Inject constructor(
      */
     fun isNewAppLayoutEnabled(): Boolean {
         return vectorFeatures.isNewAppLayoutFeatureEnabled() &&
-                defaultPrefs.getBoolean(SETTINGS_LABS_NEW_APP_LAYOUT_KEY, getDefault(R.bool.settings_labs_new_app_layout_default))
+                defaultPrefs.getBoolean(SETTINGS_LABS_NEW_APP_LAYOUT_KEY, getDefault(im.vector.app.config.R.bool.settings_labs_new_app_layout_default))
     }
 
     /**
      * Indicates whether or not deferred DMs are enabled.
      */
     fun isDeferredDmEnabled(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_LABS_DEFERRED_DM_KEY, getDefault(R.bool.settings_labs_deferred_dm_default))
+        return defaultPrefs.getBoolean(SETTINGS_LABS_DEFERRED_DM_KEY, getDefault(im.vector.app.config.R.bool.settings_labs_deferred_dm_default))
     }
 
     /**
      * Indicates whether or not new session manager screens are enabled.
      */
     fun isNewSessionManagerEnabled(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_LABS_NEW_SESSION_MANAGER_KEY, getDefault(R.bool.settings_labs_new_session_manager_default))
+        return defaultPrefs.getBoolean(SETTINGS_LABS_NEW_SESSION_MANAGER_KEY, getDefault(im.vector.app.config.R.bool.settings_labs_new_session_manager_default))
     }
 
     /**
      * Indicates whether or not client info recording is enabled.
      */
     fun isClientInfoRecordingEnabled(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_LABS_CLIENT_INFO_RECORDING_KEY, getDefault(R.bool.settings_labs_client_info_recording_default))
+        return defaultPrefs.getBoolean(
+                SETTINGS_LABS_CLIENT_INFO_RECORDING_KEY,
+                getDefault(
+                        im.vector.app.config.R.bool.settings_labs_client_info_recording_default
+                )
+        )
     }
 
     fun showLiveSenderInfo(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_TIMELINE_SHOW_LIVE_SENDER_INFO, getDefault(R.bool.settings_timeline_show_live_sender_info_default))
+        return defaultPrefs.getBoolean(
+                SETTINGS_TIMELINE_SHOW_LIVE_SENDER_INFO,
+                getDefault(im.vector.app.config.R.bool.settings_timeline_show_live_sender_info_default)
+        )
     }
 
     fun isRichTextEditorEnabled(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_LABS_RICH_TEXT_EDITOR_KEY, getDefault(R.bool.settings_labs_rich_text_editor_default))
+        return defaultPrefs.getBoolean(
+                SETTINGS_LABS_RICH_TEXT_EDITOR_KEY,
+                getDefault(im.vector.app.config.R.bool.settings_labs_rich_text_editor_default)
+        )
     }
 
     fun isVoiceBroadcastEnabled(): Boolean {
         return vectorFeatures.isVoiceBroadcastEnabled() &&
-                defaultPrefs.getBoolean(SETTINGS_LABS_VOICE_BROADCAST_KEY, getDefault(R.bool.settings_labs_enable_voice_broadcast_default))
+                defaultPrefs.getBoolean(
+                        SETTINGS_LABS_VOICE_BROADCAST_KEY,
+                        getDefault(im.vector.app.config.R.bool.settings_labs_enable_voice_broadcast_default)
+                )
     }
 
     fun showIpAddressInSessionManagerScreens(): Boolean {
-        return defaultPrefs.getBoolean(SETTINGS_SESSION_MANAGER_SHOW_IP_ADDRESS, getDefault(R.bool.settings_session_manager_show_ip_address))
+        return defaultPrefs.getBoolean(
+                SETTINGS_SESSION_MANAGER_SHOW_IP_ADDRESS,
+                getDefault(im.vector.app.config.R.bool.settings_session_manager_show_ip_address)
+        )
     }
 
     fun setIpAddressVisibilityInDeviceManagerScreens(isVisible: Boolean) {

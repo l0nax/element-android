@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2020 New Vector Ltd
+ * Copyright 2020-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app
@@ -27,6 +18,7 @@ import im.vector.app.espresso.tools.waitUntilViewVisible
 import im.vector.app.features.home.HomeActivity
 import im.vector.app.ui.robot.AnalyticsRobot
 import im.vector.app.ui.robot.OnboardingRobot
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -184,18 +176,18 @@ abstract class VerificationTestBase {
         Espresso.onView(ViewMatchers.isRoot())
                 .perform(waitForView(ViewMatchers.withId(R.id.bottomSheetFragmentContainer)))
 
-        Espresso.onView(ViewMatchers.withText(R.string.verification_verify_identity))
+        Espresso.onView(ViewMatchers.withText(CommonStrings.verification_verify_identity))
                 .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         // 4S is not setup so passphrase option should be hidden
         Espresso.onView(ViewMatchers.withId(R.id.bottomSheetVerificationRecyclerView))
-                .check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.verification_cannot_access_other_session)))))
+                .check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.hasDescendant(ViewMatchers.withText(CommonStrings.verification_cannot_access_other_session)))))
 
         Espresso.onView(ViewMatchers.withId(R.id.bottomSheetVerificationRecyclerView))
-                .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.verification_verify_with_another_device))))
+                .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(CommonStrings.verification_verify_with_another_device))))
 
         Espresso.onView(ViewMatchers.withId(R.id.bottomSheetVerificationRecyclerView))
-                .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.bad_passphrase_key_reset_all_action))))
+                .check(ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(CommonStrings.bad_passphrase_key_reset_all_action))))
 
         return uiSession
     }

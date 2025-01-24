@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.crypto.verification.user
@@ -27,6 +18,7 @@ import im.vector.app.features.crypto.verification.epoxy.bottomSheetVerificationQ
 import im.vector.app.features.crypto.verification.epoxy.bottomSheetVerificationWaitingItem
 import im.vector.app.features.displayname.getBestName
 import im.vector.lib.core.utils.epoxy.charsequence.toEpoxyCharSequence
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.session.crypto.model.RoomEncryptionTrustLevel
 import org.matrix.android.sdk.api.session.crypto.verification.CancelCode
 import org.matrix.android.sdk.api.session.crypto.verification.EmojiRepresentation
@@ -41,7 +33,7 @@ fun BaseEpoxyVerificationController.verifiedSuccessTile() {
         id("notice_done")
         notice(
                 host.stringProvider.getString(
-                        R.string.verification_conclusion_ok_notice
+                        CommonStrings.verification_conclusion_ok_notice
                 )
                         .toEpoxyCharSequence()
         )
@@ -60,10 +52,10 @@ fun BaseEpoxyVerificationController.bottomDone(listener: ClickListener) {
 
     bottomSheetVerificationActionItem {
         id("done")
-        title(host.stringProvider.getString(R.string.done))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+        title(host.stringProvider.getString(CommonStrings.done))
+        titleColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
         iconRes(R.drawable.ic_arrow_right)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+        iconColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
 //        listener { host.listener?.onDone(true) }
         listener(listener)
     }
@@ -77,10 +69,10 @@ fun BaseEpoxyVerificationController.gotIt(listener: ClickListener) {
 
     bottomSheetVerificationActionItem {
         id("gotit")
-        title(host.stringProvider.getString(R.string.action_got_it))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+        title(host.stringProvider.getString(CommonStrings.action_got_it))
+        titleColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
         iconRes(R.drawable.ic_arrow_right)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+        iconColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
         listener(listener)
     }
 }
@@ -90,13 +82,13 @@ fun BaseEpoxyVerificationController.renderStartTransactionOptions(request: Pendi
     val scanOtherCodeTitle: String
     val compareEmojiSubtitle: String
     if (isMe) {
-        scanCodeInstructions = stringProvider.getString(R.string.verification_scan_self_notice)
-        scanOtherCodeTitle = stringProvider.getString(R.string.verification_scan_with_this_device)
-        compareEmojiSubtitle = stringProvider.getString(R.string.verification_scan_self_emoji_subtitle)
+        scanCodeInstructions = stringProvider.getString(CommonStrings.verification_scan_self_notice)
+        scanOtherCodeTitle = stringProvider.getString(CommonStrings.verification_scan_with_this_device)
+        compareEmojiSubtitle = stringProvider.getString(CommonStrings.verification_scan_self_emoji_subtitle)
     } else {
-        scanCodeInstructions = stringProvider.getString(R.string.verification_scan_notice)
-        scanOtherCodeTitle = stringProvider.getString(R.string.verification_scan_their_code)
-        compareEmojiSubtitle = stringProvider.getString(R.string.verification_scan_emoji_subtitle)
+        scanCodeInstructions = stringProvider.getString(CommonStrings.verification_scan_notice)
+        scanOtherCodeTitle = stringProvider.getString(CommonStrings.verification_scan_their_code)
+        compareEmojiSubtitle = stringProvider.getString(CommonStrings.verification_scan_emoji_subtitle)
     }
     val host = this
 
@@ -120,9 +112,9 @@ fun BaseEpoxyVerificationController.renderStartTransactionOptions(request: Pendi
         bottomSheetVerificationActionItem {
             id("openCamera")
             title(scanOtherCodeTitle)
-            titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+            titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
             iconRes(R.drawable.ic_camera)
-            iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+            iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
             listener { host.listener?.openCamera() }
         }
 
@@ -132,20 +124,20 @@ fun BaseEpoxyVerificationController.renderStartTransactionOptions(request: Pendi
 
         bottomSheetVerificationActionItem {
             id("openEmoji")
-            title(host.stringProvider.getString(R.string.verification_scan_emoji_title))
-            titleColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+            title(host.stringProvider.getString(CommonStrings.verification_scan_emoji_title))
+            titleColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
             subTitle(compareEmojiSubtitle)
             iconRes(R.drawable.ic_arrow_right)
-            iconColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+            iconColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
             listener { host.listener?.doVerifyBySas() }
         }
     } else if (request.isSasSupported) {
         bottomSheetVerificationActionItem {
             id("openEmoji")
-            title(host.stringProvider.getString(R.string.verification_no_scan_emoji_title))
-            titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+            title(host.stringProvider.getString(CommonStrings.verification_no_scan_emoji_title))
+            titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
             iconRes(R.drawable.ic_arrow_right)
-            iconColor(host.colorProvider.getColorFromAttribute(R.attr.vctr_content_primary))
+            iconColor(host.colorProvider.getColorFromAttribute(im.vector.lib.ui.styles.R.attr.vctr_content_primary))
             listener { host.listener?.doVerifyBySas() }
         }
     } else {
@@ -160,20 +152,20 @@ fun BaseEpoxyVerificationController.renderAcceptDeclineRequest() {
     }
     bottomSheetVerificationActionItem {
         id("accept_pr")
-        title(host.stringProvider.getString(R.string.action_accept))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
-        // subTitle(host.stringProvider.getString(R.string.verification_request_start_notice))
+        title(host.stringProvider.getString(CommonStrings.action_accept))
+        titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
+        // subTitle(host.stringProvider.getString(CommonStrings.verification_request_start_notice))
         iconRes(R.drawable.ic_arrow_right)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+        iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
         listener { host.listener?.acceptRequest() }
     }
     bottomSheetVerificationActionItem {
         id("decline_pr")
-        title(host.stringProvider.getString(R.string.action_decline))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
-        // subTitle(host.stringProvider.getString(R.string.verification_request_start_notice))
+        title(host.stringProvider.getString(CommonStrings.action_decline))
+        titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
+        // subTitle(host.stringProvider.getString(CommonStrings.verification_request_start_notice))
         iconRes(R.drawable.ic_arrow_right)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
+        iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
         listener { host.listener?.declineRequest() }
     }
 }
@@ -190,7 +182,7 @@ fun BaseEpoxyVerificationController.renderCancel(cancelCode: CancelCode) {
         CancelCode.MismatchedKeys -> {
             bottomSheetVerificationNoticeItem {
                 id("notice")
-                notice(host.stringProvider.getString(R.string.verification_conclusion_not_secure).toEpoxyCharSequence())
+                notice(host.stringProvider.getString(CommonStrings.verification_conclusion_not_secure).toEpoxyCharSequence())
             }
 
             bottomSheetVerificationBigImageItem {
@@ -200,13 +192,13 @@ fun BaseEpoxyVerificationController.renderCancel(cancelCode: CancelCode) {
 
             bottomSheetVerificationNoticeItem {
                 id("warning_notice")
-                notice(host.eventHtmlRenderer.render(host.stringProvider.getString(R.string.verification_conclusion_compromised)).toEpoxyCharSequence())
+                notice(host.eventHtmlRenderer.render(host.stringProvider.getString(CommonStrings.verification_conclusion_compromised)).toEpoxyCharSequence())
             }
         }
         else -> {
             bottomSheetVerificationNoticeItem {
                 id("notice_cancelled")
-                notice(host.stringProvider.getString(R.string.verify_cancelled_notice).toEpoxyCharSequence())
+                notice(host.stringProvider.getString(CommonStrings.verify_cancelled_notice).toEpoxyCharSequence())
             }
         }
     }
@@ -216,7 +208,7 @@ fun BaseEpoxyVerificationController.buildEmojiItem(emoji: List<EmojiRepresentati
     val host = this
     bottomSheetVerificationNoticeItem {
         id("notice")
-        notice(host.stringProvider.getString(R.string.verification_emoji_notice).toEpoxyCharSequence())
+        notice(host.stringProvider.getString(CommonStrings.verification_emoji_notice).toEpoxyCharSequence())
     }
 
     bottomSheetVerificationEmojisItem {
@@ -240,10 +232,10 @@ fun BaseEpoxyVerificationController.buildSasCodeActions() {
     }
     bottomSheetVerificationActionItem {
         id("ko")
-        title(host.stringProvider.getString(R.string.verification_sas_do_not_match))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
+        title(host.stringProvider.getString(CommonStrings.verification_sas_do_not_match))
+        titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
         iconRes(R.drawable.ic_check_off)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
+        iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
         listener { host.listener?.onDoNotMatchButtonTapped() }
     }
     bottomSheetDividerItem {
@@ -251,10 +243,10 @@ fun BaseEpoxyVerificationController.buildSasCodeActions() {
     }
     bottomSheetVerificationActionItem {
         id("ok")
-        title(host.stringProvider.getString(R.string.verification_sas_match))
-        titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+        title(host.stringProvider.getString(CommonStrings.verification_sas_match))
+        titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
         iconRes(R.drawable.ic_check_on)
-        iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+        iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
         listener { host.listener?.onMatchButtonTapped() }
     }
 }
@@ -272,7 +264,7 @@ fun BaseEpoxyVerificationController.renderSasTransaction(transaction: Verificati
                 // waiting
                 bottomSheetVerificationWaitingItem {
                     id("waiting")
-                    title(host.stringProvider.getString(R.string.please_wait))
+                    title(host.stringProvider.getString(CommonStrings.please_wait))
                 }
             }
         }
@@ -284,7 +276,7 @@ fun BaseEpoxyVerificationController.renderSasTransaction(transaction: Verificati
             // waiting
             bottomSheetVerificationWaitingItem {
                 id("waiting")
-                title(host.stringProvider.getString(R.string.please_wait))
+                title(host.stringProvider.getString(CommonStrings.please_wait))
             }
         }
     }
@@ -298,7 +290,7 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
             bottomSheetVerificationNoticeItem {
                 id("notice")
                 apply {
-                    notice(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting_notice).toEpoxyCharSequence())
+                    notice(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting_notice).toEpoxyCharSequence())
                 }
             }
 
@@ -310,9 +302,9 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
             bottomSheetVerificationWaitingItem {
                 id("waiting")
                 if (otherUserItem != null) {
-                    title(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting, otherUserItem.getBestName()))
+                    title(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting, otherUserItem.getBestName()))
                 } else {
-                    title(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting, transaction.otherDeviceId.orEmpty()))
+                    title(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting, transaction.otherDeviceId.orEmpty()))
                 }
             }
         }
@@ -323,9 +315,9 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
                 apply {
                     if (otherUserItem != null) {
                         val name = otherUserItem.getBestName()
-                        notice(host.stringProvider.getString(R.string.qr_code_scanned_by_other_notice, name).toEpoxyCharSequence())
+                        notice(host.stringProvider.getString(CommonStrings.qr_code_scanned_by_other_notice, name).toEpoxyCharSequence())
                     } else {
-                        notice(host.stringProvider.getString(R.string.qr_code_scanned_self_verif_notice).toEpoxyCharSequence())
+                        notice(host.stringProvider.getString(CommonStrings.qr_code_scanned_self_verif_notice).toEpoxyCharSequence())
                     }
                 }
             }
@@ -341,10 +333,10 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
 
             bottomSheetVerificationActionItem {
                 id("deny")
-                title(host.stringProvider.getString(R.string.qr_code_scanned_by_other_no))
-                titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
+                title(host.stringProvider.getString(CommonStrings.qr_code_scanned_by_other_no))
+                titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
                 iconRes(R.drawable.ic_check_off)
-                iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorError))
+                iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorError))
                 listener { host.listener?.onUserDeniesQrCodeScanned() }
             }
 
@@ -354,10 +346,10 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
 
             bottomSheetVerificationActionItem {
                 id("confirm")
-                title(host.stringProvider.getString(R.string.qr_code_scanned_by_other_yes))
-                titleColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+                title(host.stringProvider.getString(CommonStrings.qr_code_scanned_by_other_yes))
+                titleColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
                 iconRes(R.drawable.ic_check_on)
-                iconColor(host.colorProvider.getColorFromAttribute(R.attr.colorPrimary))
+                iconColor(host.colorProvider.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary))
                 listener { host.listener?.onUserConfirmsQrCodeScanned() }
             }
         }
@@ -365,7 +357,7 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
             bottomSheetVerificationNoticeItem {
                 id("notice")
                 apply {
-                    notice(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting_notice).toEpoxyCharSequence())
+                    notice(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting_notice).toEpoxyCharSequence())
                 }
             }
 
@@ -378,9 +370,9 @@ fun BaseEpoxyVerificationController.renderQrTransaction(transaction: Verificatio
                 id("waiting")
                 apply {
                     if (otherUserItem != null) {
-                        title(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting, otherUserItem.getBestName()))
+                        title(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting, otherUserItem.getBestName()))
                     } else {
-                        title(host.stringProvider.getString(R.string.qr_code_scanned_verif_waiting, transaction.otherDeviceId.orEmpty()))
+                        title(host.stringProvider.getString(CommonStrings.qr_code_scanned_verif_waiting, transaction.otherDeviceId.orEmpty()))
                     }
                 }
             }

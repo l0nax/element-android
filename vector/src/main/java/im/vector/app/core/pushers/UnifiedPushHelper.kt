@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.core.pushers
@@ -21,11 +12,11 @@ import androidx.annotation.MainThread
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import im.vector.app.R
 import im.vector.app.core.resources.StringProvider
 import im.vector.app.core.utils.getApplicationLabel
 import im.vector.app.features.mdm.MdmData
 import im.vector.app.features.mdm.MdmService
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.cache.CacheStrategy
 import org.matrix.android.sdk.api.failure.Failure
@@ -52,9 +43,9 @@ class UnifiedPushHelper @Inject constructor(
     ) {
         val internalDistributorName = stringProvider.getString(
                 if (fcmHelper.isFirebaseAvailable()) {
-                    R.string.unifiedpush_distributor_fcm_fallback
+                    CommonStrings.unifiedpush_distributor_fcm_fallback
                 } else {
-                    R.string.unifiedpush_distributor_background_sync
+                    CommonStrings.unifiedpush_distributor_background_sync
                 }
         )
 
@@ -68,7 +59,7 @@ class UnifiedPushHelper @Inject constructor(
         }
 
         MaterialAlertDialogBuilder(context)
-                .setTitle(stringProvider.getString(R.string.unifiedpush_getdistributors_dialog_title))
+                .setTitle(stringProvider.getString(CommonStrings.unifiedpush_getdistributors_dialog_title))
                 .setItems(distributorsName.toTypedArray()) { _, which ->
                     val distributor = distributors[which]
                     onDistributorSelected(distributor)
@@ -105,14 +96,14 @@ class UnifiedPushHelper @Inject constructor(
             unifiedPushStore.storePushGateway(
                     gateway = mdmService.getData(
                             mdmData = MdmData.DefaultPushGatewayUrl,
-                            defaultValue = stringProvider.getString(R.string.pusher_http_url),
+                            defaultValue = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url),
                     )
             )
             onDoneRunnable?.run()
             return
         }
         // else, unifiedpush, and pushkey is an endpoint
-        val gateway = stringProvider.getString(R.string.default_push_gateway_http_url)
+        val gateway = stringProvider.getString(im.vector.app.config.R.string.default_push_gateway_http_url)
         val parsed = URL(endpoint)
         val port = if (parsed.port != -1) {
             ":${parsed.port}"
@@ -153,8 +144,8 @@ class UnifiedPushHelper @Inject constructor(
 
     fun getCurrentDistributorName(): String {
         return when {
-            isEmbeddedDistributor() -> stringProvider.getString(R.string.unifiedpush_distributor_fcm_fallback)
-            isBackgroundSync() -> stringProvider.getString(R.string.unifiedpush_distributor_background_sync)
+            isEmbeddedDistributor() -> stringProvider.getString(CommonStrings.unifiedpush_distributor_fcm_fallback)
+            isBackgroundSync() -> stringProvider.getString(CommonStrings.unifiedpush_distributor_background_sync)
             else -> context.getApplicationLabel(UnifiedPush.getDistributor(context))
         }
     }
@@ -196,7 +187,7 @@ class UnifiedPushHelper @Inject constructor(
         return if (isEmbeddedDistributor()) {
             mdmService.getData(
                     mdmData = MdmData.DefaultPushGatewayUrl,
-                    defaultValue = stringProvider.getString(R.string.pusher_http_url),
+                    defaultValue = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url),
             )
         } else {
             unifiedPushStore.getPushGateway()

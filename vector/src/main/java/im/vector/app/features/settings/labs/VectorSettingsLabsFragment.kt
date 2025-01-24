@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2019 New Vector Ltd
+ * Copyright 2019-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.settings.labs
@@ -35,6 +26,7 @@ import im.vector.app.features.analytics.plan.MobileScreen
 import im.vector.app.features.home.room.threads.ThreadsManager
 import im.vector.app.features.settings.VectorPreferences
 import im.vector.app.features.settings.VectorSettingsBaseFragment
+import im.vector.lib.strings.CommonStrings
 import org.matrix.android.sdk.api.settings.LightweightSettingsStorage
 import javax.inject.Inject
 
@@ -49,7 +41,7 @@ class VectorSettingsLabsFragment :
     @Inject lateinit var threadsManager: ThreadsManager
     @Inject lateinit var vectorFeatures: VectorFeatures
 
-    override var titleRes = R.string.room_settings_labs_pref_title
+    override var titleRes = CommonStrings.room_settings_labs_pref_title
     override val preferenceXmlRes = R.xml.vector_settings_labs
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,13 +112,13 @@ class VectorSettingsLabsFragment :
         if (!session.homeServerCapabilitiesService().getHomeServerCapabilities().canUseThreading && userEnabledThreads) {
             activity?.let {
                 MaterialAlertDialogBuilder(it)
-                        .setTitle(R.string.threads_labs_enable_notice_title)
+                        .setTitle(CommonStrings.threads_labs_enable_notice_title)
                         .setMessage(threadsManager.getLabsEnableThreadsMessage())
                         .setCancelable(true)
-                        .setNegativeButton(R.string.action_not_now) { _, _ ->
+                        .setNegativeButton(CommonStrings.action_not_now) { _, _ ->
                             vectorSwitchPreference.isChecked = false
                         }
-                        .setPositiveButton(R.string.action_try_it_out) { _, _ ->
+                        .setPositiveButton(CommonStrings.action_try_it_out) { _, _ ->
                             onThreadsPreferenceClicked()
                         }
                         .show()

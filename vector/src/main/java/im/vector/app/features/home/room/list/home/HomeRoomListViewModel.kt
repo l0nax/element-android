@@ -1,17 +1,8 @@
 /*
- * Copyright (c) 2022 New Vector Ltd
+ * Copyright 2022-2024 New Vector Ltd.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
  */
 
 package im.vector.app.features.home.room.list.home
@@ -35,6 +26,7 @@ import im.vector.app.features.analytics.extensions.toTrackingValue
 import im.vector.app.features.analytics.plan.UserProperties
 import im.vector.app.features.displayname.getBestName
 import im.vector.app.features.home.room.list.home.header.HomeRoomFilter
+import im.vector.lib.strings.CommonStrings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -284,24 +276,24 @@ class HomeRoomListViewModel @AssistedInject constructor(
             HomeRoomFilter.ALL ->
                 if (selectedSpace != null) {
                     StateView.State.Empty(
-                            title = stringProvider.getString(R.string.home_empty_space_no_rooms_title, selectedSpace.displayName),
-                            message = stringProvider.getString(R.string.home_empty_space_no_rooms_message),
+                            title = stringProvider.getString(CommonStrings.home_empty_space_no_rooms_title, selectedSpace.displayName),
+                            message = stringProvider.getString(CommonStrings.home_empty_space_no_rooms_message),
                             image = drawableProvider.getDrawable(R.drawable.ill_empty_space),
                             isBigImage = true
                     )
                 } else {
                     val userName = session.getUserOrDefault(session.myUserId).toMatrixItem().getBestName()
                     StateView.State.Empty(
-                            title = stringProvider.getString(R.string.home_empty_no_rooms_title, userName),
-                            message = stringProvider.getString(R.string.home_empty_no_rooms_message),
+                            title = stringProvider.getString(CommonStrings.home_empty_no_rooms_title, userName),
+                            message = stringProvider.getString(CommonStrings.home_empty_no_rooms_message),
                             image = drawableProvider.getDrawable(R.drawable.ill_empty_all_chats),
                             isBigImage = true
                     )
                 }
             HomeRoomFilter.UNREADS ->
                 StateView.State.Empty(
-                        title = stringProvider.getString(R.string.home_empty_no_unreads_title),
-                        message = stringProvider.getString(R.string.home_empty_no_unreads_message),
+                        title = stringProvider.getString(CommonStrings.home_empty_no_unreads_title),
+                        message = stringProvider.getString(CommonStrings.home_empty_no_unreads_message),
                         image = drawableProvider.getDrawable(R.drawable.ill_empty_unreads),
                         isBigImage = true,
                         imageScaleType = ImageView.ScaleType.CENTER_INSIDE

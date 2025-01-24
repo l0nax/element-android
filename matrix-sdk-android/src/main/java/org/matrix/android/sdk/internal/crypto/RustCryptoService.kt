@@ -16,7 +16,6 @@
 
 package org.matrix.android.sdk.internal.crypto
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.paging.PagedList
@@ -55,6 +54,7 @@ import org.matrix.android.sdk.api.session.crypto.model.MXUsersDevicesMap
 import org.matrix.android.sdk.api.session.events.model.Content
 import org.matrix.android.sdk.api.session.events.model.Event
 import org.matrix.android.sdk.api.session.events.model.EventType
+import org.matrix.android.sdk.api.session.events.model.content.EncryptedEventContent
 import org.matrix.android.sdk.api.session.events.model.content.EncryptionEventContent
 import org.matrix.android.sdk.api.session.events.model.content.RoomKeyContent
 import org.matrix.android.sdk.api.session.events.model.content.RoomKeyWithHeldContent
@@ -134,6 +134,7 @@ internal class RustCryptoService @Inject constructor(
         private val getRoomUserIds: GetRoomUserIdsUseCase,
         private val outgoingRequestsProcessor: OutgoingRequestsProcessor,
         private val matrixConfiguration: MatrixConfiguration,
+        private val perSessionBackupQueryRateLimiter: PerSessionBackupQueryRateLimiter,
 ) : CryptoService {
 
     private val isStarting = AtomicBoolean(false)
@@ -180,13 +181,6 @@ internal class RustCryptoService @Inject constructor(
 
     override suspend fun deleteDevice(deviceId: String, userInteractiveAuthInterceptor: UserInteractiveAuthInterceptor) {
         deleteDevices(listOf(deviceId), userInteractiveAuthInterceptor)
-    }
-
-    override fun getCryptoVersion(context: Context, longFormat: Boolean): String {
-        val version = org.matrix.rustcomponents.sdk.crypto.version()
-        val gitHash = org.matrix.rustcomponents.sdk.crypto.versionInfo().gitSha
-        val vodozemac = org.matrix.rustcomponents.sdk.crypto.vodozemacVersion()
-        return if (longFormat) "Rust SDK $version ($gitHash), Vodozemac $vodozemac" else version
     }
 
     override suspend fun getMyCryptoDevice(): CryptoDeviceInfo = withContext(coroutineDispatchers.io) {
@@ -494,7 +488,28 @@ internal class RustCryptoService @Inject constructor(
      */
     @Throws(MXCryptoError::class)
     override suspend fun decryptEvent(event: Event, timeline: String): MXEventDecryptionResult {
-        return olmMachine.decryptRoomEvent(event)
+        return try {
+            olmMachine.decryptRoomEvent(event).also {
+                liveEventManager.get().dispatchLiveEventDecrypted(event, it)
+            }
+        } catch (mxCryptoError: MXCryptoError) {
+            liveEventManager.get().dispatchLiveEventDecryptionFailed(event, mxCryptoError)
+            if (mxCryptoError is MXCryptoError.Base && (
+                            mxCryptoError.errorType == MXCryptoError.ErrorType.UNKNOWN_INBOUND_SESSION_ID ||
+                                    mxCryptoError.errorType == MXCryptoError.ErrorType.UNKNOWN_MESSAGE_INDEX)) {
+                Timber.v("Try to perform a lazy migration from legacy store")
+                /**
+                 * It's a bit hacky, check how this can be better integrated with rust?
+                 */
+                val content = event.content?.toModel<EncryptedEventContent>() ?: throw mxCryptoError
+                val roomId = event.roomId
+                val sessionId = content.sessionId
+                if (roomId != null && sessionId != null) {
+                    perSessionBackupQueryRateLimiter.tryFromBackupIfPossible(sessionId, roomId)
+                }
+            }
+            throw mxCryptoError
+        }
     }
 
     /**
@@ -600,7 +615,7 @@ internal class RustCryptoService @Inject constructor(
     }
 
     private fun notifyRoomKeyReceived(
-            roomId: String,
+            roomId: String?,
             sessionId: String,
     ) {
         megolmSessionImportManager.dispatchNewSession(roomId, sessionId)
@@ -637,9 +652,9 @@ internal class RustCryptoService @Inject constructor(
             when (event.type) {
                 EventType.ROOM_KEY -> {
                     val content = event.getClearContent().toModel<RoomKeyContent>() ?: return@forEach
-                    content.sessionKey
-                    val roomId = content.sessionId ?: return@forEach
-                    val sessionId = content.sessionId
+
+                    val roomId = content.roomId
+                    val sessionId = content.sessionId ?: return@forEach
 
                     notifyRoomKeyReceived(roomId, sessionId)
                     matrixConfiguration.cryptoAnalyticsPlugin?.onRoomKeyImported(sessionId, EventType.ROOM_KEY)
@@ -647,8 +662,8 @@ internal class RustCryptoService @Inject constructor(
                 EventType.FORWARDED_ROOM_KEY -> {
                     val content = event.getClearContent().toModel<ForwardedRoomKeyContent>() ?: return@forEach
 
-                    val roomId = content.sessionId ?: return@forEach
-                    val sessionId = content.sessionId
+                    val roomId = content.roomId
+                    val sessionId = content.sessionId ?: return@forEach
 
                     notifyRoomKeyReceived(roomId, sessionId)
                     matrixConfiguration.cryptoAnalyticsPlugin?.onRoomKeyImported(sessionId, EventType.FORWARDED_ROOM_KEY)
@@ -829,9 +844,9 @@ internal class RustCryptoService @Inject constructor(
     override fun removeSessionListener(listener: NewSessionListener) {
         megolmSessionImportManager.removeListener(listener)
     }
-/* ==========================================================================================
- * DEBUG INFO
- * ========================================================================================== */
+    /* ==========================================================================================
+     * DEBUG INFO
+     * ========================================================================================== */
 
     override fun toString(): String {
         return "DefaultCryptoService of $myUserId ($deviceId)"
